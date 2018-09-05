@@ -61,6 +61,10 @@ Sub Login()
         Call WriteLoginExistingChar
     ElseIf EstadoLogin = E_MODO.CrearNuevoPj Then
         Call WriteLoginNewChar
+    ElseIf EstadoLogin = E_MODO.RecuperarPJ Then
+        Call WriteRecoverChar
+    ElseIf EstadoLogin = E_MODO.borrarpj Then
+        Call WriteKillChar
     End If
     
     DoEvents

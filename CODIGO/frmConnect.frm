@@ -324,7 +324,7 @@ Private Sub CheckLicenseAgreement()
     Dim i As Long
     
     For i = 0 To Me.Controls.Count - 1
-        If Me.Controls(i).name = "imgCodigoFuente" Then
+        If Me.Controls(i).Name = "imgCodigoFuente" Then
             Exit For
         End If
     Next i
@@ -424,14 +424,24 @@ Private Sub CheckServers()
 End Sub
 
 Private Sub imgBorrarPj_Click()
-
-On Error GoTo errH
-    Call Shell(App.path & "\RECUPERAR.EXE", vbNormalFocus)
-
-    Exit Sub
-
-errH:
-    Call MsgBox("No se encuentra el programa recuperar.exe", vbCritical, "Argentum Online")
+EstadoLogin = E_MODO.borrarpj
+ 
+#If UsarWrench = 1 Then
+    If frmMain.Socket1.Connected Then
+        frmMain.Socket1.Disconnect
+        frmMain.Socket1.Cleanup
+        DoEvents
+    End If
+    frmMain.Socket1.HostName = "127.0.0.1"
+    frmMain.Socket1.RemotePort = 7668
+    frmMain.Socket1.Connect
+#Else
+    If frmMain.Winsock1.State <> sckClosed Then
+        frmMain.Winsock1.Close
+        DoEvents
+    End If
+    frmMain.Winsock1.Connect CurServerIp, CurServerPort
+#End If
 End Sub
 
 Private Sub imgCodigoFuente_Click()
@@ -522,13 +532,24 @@ Private Sub imgManual_Click()
 End Sub
 
 Private Sub imgRecuperar_Click()
-On Error GoTo errH
-
-    Call Audio.PlayWave(SND_CLICK)
-    Call Shell(App.path & "\RECUPERAR.EXE", vbNormalFocus)
-    Exit Sub
-errH:
-    Call MsgBox("No se encuentra el programa recuperar.exe", vbCritical, "Argentum Online")
+    EstadoLogin = E_MODO.RecuperarPJ
+ 
+    #If UsarWrench = 1 Then
+        If frmMain.Socket1.Connected Then
+            frmMain.Socket1.Disconnect
+            frmMain.Socket1.Cleanup
+            DoEvents
+        End If
+        frmMain.Socket1.HostName = "127.0.0.1"
+        frmMain.Socket1.RemotePort = 7668
+        frmMain.Socket1.Connect
+    #Else
+        If frmMain.Winsock1.State <> sckClosed Then
+            frmMain.Winsock1.Close
+            DoEvents
+        End If
+        frmMain.Winsock1.Connect CurServerIp, CurServerPort
+    #End If
 End Sub
 
 Private Sub imgReglamento_Click()

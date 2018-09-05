@@ -1305,6 +1305,7 @@ Private Sub Form_Load()
     Cargando = False
     
     'UserClase = 0
+    UserClave = vbNullString
     UserSexo = 0
     UserRaza = 0
     UserHogar = 0
@@ -1611,6 +1612,12 @@ Private Sub imgCrear_Click()
         End If
     Next i
     
+    UserClave = TxtClave.Text
+    If UserClave = vbNullString Then
+        MsgBox ("Clave/pin invalido.")
+        Exit Sub
+    End If
+    
     UserEmail = txtMail.Text
     
 #If UsarWrench = 1 Then
@@ -1619,6 +1626,9 @@ Private Sub imgCrear_Click()
 #End If
     
     EstadoLogin = E_MODO.CrearNuevoPj
+    
+    'Clear spell list
+    frmMain.hlst.Clear
     
 #If UsarWrench = 1 Then
     If Not frmMain.Socket1.Connected Then

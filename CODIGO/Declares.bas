@@ -641,8 +641,8 @@ End Enum
 
 'Inventario
 Type Inventory
-    OBJIndex As Integer
-    name As String
+    ObjIndex As Integer
+    Name As String
     GrhIndex As Integer
     '[Alejo]: tipo de datos ahora es Long
     Amount As Long
@@ -657,8 +657,8 @@ Type Inventory
 End Type
 
 Type NpCinV
-    OBJIndex As Integer
-    name As String
+    ObjIndex As Integer
+    Name As String
     GrhIndex As Integer
     Amount As Integer
     Valor As Single
@@ -697,8 +697,8 @@ Type tEstadisticasUsu
 End Type
 
 Type tItemsConstruibles
-    name As String
-    OBJIndex As Integer
+    Name As String
+    ObjIndex As Integer
     GrhIndex As Integer
     LinH As Integer
     LinP As Integer
@@ -772,6 +772,7 @@ Public UserClase As eClass
 Public UserSexo As eGenero
 Public UserRaza As eRaza
 Public UserEmail As String
+Public UserClave As String
 
 Public Const NUMCIUDADES As Byte = 5
 Public Const NUMSKILLS As Byte = 20
@@ -809,6 +810,8 @@ Public Enum E_MODO
     Normal = 1
     CrearNuevoPj = 2
     Dados = 3
+    RecuperarPJ = 4
+    borrarpj = 5
 End Enum
 
 Public EstadoLogin As E_MODO
