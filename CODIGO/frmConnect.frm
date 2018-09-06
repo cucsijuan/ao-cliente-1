@@ -403,7 +403,7 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y A
     LastButtonPressed.ToggleToNormal
 End Sub
 
-Private Sub CheckServers() 'j
+Private Sub CheckServers()
     If ServersRecibidos Then
         If Not IsIp(IPTxt) And CurServer <> 0 Then
             If MsgBox("Atencion, está intentando conectarse a un servidor no oficial, NoLand Studios no se hace responsable de los posibles problemas que estos servidores presenten. ¿Desea continuar?", vbYesNo) = vbNo Then
