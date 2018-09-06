@@ -403,7 +403,7 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y A
     LastButtonPressed.ToggleToNormal
 End Sub
 
-Private Sub CheckServers()
+Private Sub CheckServers() 'j
     If ServersRecibidos Then
         If Not IsIp(IPTxt) And CurServer <> 0 Then
             If MsgBox("Atencion, está intentando conectarse a un servidor no oficial, NoLand Studios no se hace responsable de los posibles problemas que estos servidores presenten. ¿Desea continuar?", vbYesNo) = vbNo Then
@@ -424,16 +424,18 @@ Private Sub CheckServers()
 End Sub
 
 Private Sub imgBorrarPj_Click()
-EstadoLogin = E_MODO.borrarpj
+Call CheckServers
  
+EstadoLogin = E_MODO.borrarpj
+
 #If UsarWrench = 1 Then
     If frmMain.Socket1.Connected Then
         frmMain.Socket1.Disconnect
         frmMain.Socket1.Cleanup
         DoEvents
     End If
-    frmMain.Socket1.HostName = "127.0.0.1"
-    frmMain.Socket1.RemotePort = 7668
+    frmMain.Socket1.HostName = CurServerIp
+    frmMain.Socket1.RemotePort = CurServerPort
     frmMain.Socket1.Connect
 #Else
     If frmMain.Winsock1.State <> sckClosed Then
@@ -532,6 +534,7 @@ Private Sub imgManual_Click()
 End Sub
 
 Private Sub imgRecuperar_Click()
+    'abrimos la ventana recuperar pj
     EstadoLogin = E_MODO.RecuperarPJ
  
     #If UsarWrench = 1 Then
