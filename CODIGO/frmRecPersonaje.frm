@@ -1,32 +1,25 @@
 VERSION 5.00
-Begin VB.Form frmBorrarPersonaje 
+Begin VB.Form frmRecPersonaje 
    BackColor       =   &H80000000&
    BorderStyle     =   1  'Fixed Single
-   Caption         =   "Borrar personaje"
-   ClientHeight    =   2250
+   Caption         =   "Recuperar Personaje"
+   ClientHeight    =   1905
    ClientLeft      =   45
    ClientTop       =   390
-   ClientWidth     =   4200
+   ClientWidth     =   4290
    ClipControls    =   0   'False
    ControlBox      =   0   'False
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   2250
-   ScaleWidth      =   4200
-   StartUpPosition =   1  'CenterOwner
+   ScaleHeight     =   1905
+   ScaleWidth      =   4290
+   StartUpPosition =   3  'Windows Default
    Begin VB.TextBox txtClave 
       Height          =   285
       Left            =   1200
-      TabIndex        =   6
-      Top             =   960
-      Width           =   2775
-   End
-   Begin VB.TextBox txtPasswd 
-      Height          =   285
-      Left            =   1200
       TabIndex        =   2
-      Top             =   1320
+      Top             =   960
       Width           =   2775
    End
    Begin VB.TextBox txtMail 
@@ -43,6 +36,13 @@ Begin VB.Form frmBorrarPersonaje
       Top             =   240
       Width           =   2775
    End
+   Begin VB.Image Image1 
+      Height          =   315
+      Left            =   3000
+      Tag             =   "1"
+      Top             =   1440
+      Width           =   930
+   End
    Begin VB.Label Label3 
       Alignment       =   1  'Right Justify
       BackColor       =   &H80000000&
@@ -58,7 +58,7 @@ Begin VB.Form frmBorrarPersonaje
       EndProperty
       Height          =   255
       Left            =   120
-      TabIndex        =   7
+      TabIndex        =   5
       Top             =   960
       Width           =   975
    End
@@ -77,27 +77,8 @@ Begin VB.Form frmBorrarPersonaje
       EndProperty
       Height          =   255
       Left            =   120
-      TabIndex        =   5
-      Top             =   600
-      Width           =   975
-   End
-   Begin VB.Label Label1 
-      Alignment       =   1  'Right Justify
-      BackColor       =   &H80000000&
-      Caption         =   "Password:"
-      BeginProperty Font 
-         Name            =   "MS Sans Serif"
-         Size            =   8.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Height          =   255
-      Left            =   120
       TabIndex        =   4
-      Top             =   1320
+      Top             =   600
       Width           =   975
    End
    Begin VB.Label lblNombre 
@@ -119,35 +100,23 @@ Begin VB.Form frmBorrarPersonaje
       Top             =   240
       Width           =   615
    End
-   Begin VB.Image Image1 
-      Height          =   315
-      Left            =   3000
-      Tag             =   "1"
-      Top             =   1800
-      Width           =   930
-   End
 End
-Attribute VB_Name = "frmBorrarPersonaje"
+Attribute VB_Name = "frmRecPersonaje"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
-
+ 
 Private Sub Form_Load()
-    Me.Caption = "Borrar personaje"
+ 
+        Me.Caption = "Recuperar personaje"
+ 
 End Sub
-
+ 
 Private Sub Image1_Click()
         UserName = txtNombre.Text
         UserEmail = txtMail.Text
         UserClave = txtClave.Text
-        UserPassword = txtPasswd.Text
-       
-        If Not CheckMailString(txtMail.Text) Then
-            MsgBox "Direccion de mail invalida."
-            Exit Sub
-        End If
        
         If UserName = vbNullString Then
             MsgBox "Ingrese el nick de su personaje."
@@ -159,11 +128,11 @@ Private Sub Image1_Click()
             Exit Sub
         End If
        
-        If UserPassword = vbNullString Then
-            MsgBox "Ingrese la contraseña de su personaje."
+        If Not CheckMailString(txtMail.Text) Then
+            MsgBox "Direccion de mail invalida."
             Exit Sub
         End If
-        Call Login
-        Unload Me
+   
+    Call Login
+    Unload Me
 End Sub
-

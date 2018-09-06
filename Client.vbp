@@ -101,6 +101,7 @@ Class=clsSoundMapas; CODIGO\clsSoundMapas.cls
 Module=mDx8_Dibujado; CODIGO\mDx8_Dibujado.bas
 Class=clsSurfaceManStatic; CODIGO\clsSurfaceManStatic.cls
 Form=CODIGO\frmBorrarPersonaje.frm
+Form=CODIGO\frmRecPersonaje.frm
 IconForm="frmMain"
 Startup="Sub Main"
 HelpFile=""

@@ -16,6 +16,27 @@ Begin VB.Form frmCrearPersonaje
    ScaleWidth      =   799
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
+   Begin VB.TextBox txtClave 
+      BackColor       =   &H80000012&
+      BorderStyle     =   0  'None
+      BeginProperty Font 
+         Name            =   "Courier"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00FFFFFF&
+      Height          =   225
+      IMEMode         =   3  'DISABLE
+      Left            =   6240
+      PasswordChar    =   "*"
+      TabIndex        =   33
+      Top             =   7200
+      Width           =   2415
+   End
    Begin VB.PictureBox picTemp 
       AutoRedraw      =   -1  'True
       BackColor       =   &H00000000&
@@ -321,6 +342,25 @@ Begin VB.Form frmCrearPersonaje
       Top             =   5880
       Visible         =   0   'False
       Width           =   360
+   End
+   Begin VB.Label Label1 
+      BackStyle       =   0  'Transparent
+      Caption         =   "Clave Recuperacion"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H80000014&
+      Height          =   255
+      Left            =   6600
+      TabIndex        =   34
+      Top             =   6840
+      Width           =   1935
    End
    Begin VB.Image imgArcoStar 
       Height          =   195
@@ -1612,7 +1652,7 @@ Private Sub imgCrear_Click()
         End If
     Next i
     
-    UserClave = TxtClave.Text
+    UserClave = txtClave.Text
     If UserClave = vbNullString Then
         MsgBox ("Clave/pin invalido.")
         Exit Sub
@@ -1761,6 +1801,8 @@ Private Sub imgVolver_Click()
     
     Unload Me
 End Sub
+
+
 
 Private Sub lstGenero_Click()
     UserSexo = lstGenero.ListIndex + 1
