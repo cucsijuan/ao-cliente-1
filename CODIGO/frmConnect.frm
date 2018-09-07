@@ -534,6 +534,7 @@ Private Sub imgManual_Click()
 End Sub
 
 Private Sub imgRecuperar_Click()
+    Call CheckServers
     'abrimos la ventana recuperar pj
     EstadoLogin = E_MODO.RecuperarPJ
  
@@ -543,8 +544,8 @@ Private Sub imgRecuperar_Click()
             frmMain.Socket1.Cleanup
             DoEvents
         End If
-        frmMain.Socket1.HostName = "127.0.0.1"
-        frmMain.Socket1.RemotePort = 7668
+        frmMain.Socket1.HostName = CurServerIp
+        frmMain.Socket1.RemotePort = CurServerPort
         frmMain.Socket1.Connect
     #Else
         If frmMain.Winsock1.State <> sckClosed Then
