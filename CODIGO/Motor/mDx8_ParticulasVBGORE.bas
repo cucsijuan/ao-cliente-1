@@ -21,8 +21,6 @@ End Type
 
 'Texture for particle effects - this is handled differently then the rest of the graphics
 Public ParticleTexture(1 To 15) As tParticleTexture
-<<<<<<< HEAD
-=======
 
 Private Type ParticleVA
     X As Integer
@@ -35,7 +33,6 @@ Private Type ParticleVA
     Ty1 As Single
     Ty2 As Single
 End Type
->>>>>>> Refactored and fixed Vgore Particle code
 
 Private Type Effect
 
@@ -95,16 +92,12 @@ Public Sub Engine_Init_ParticleEngine()
     For i = 1 To UBound(ParticleTexture()) - 1
 
         If Not ParticleTexture(i).Texture Is Nothing Then
-<<<<<<< HEAD
-            Set ParticleTexture(i) = Nothing
-=======
             Dim ClearVar As tParticleTexture
             ParticleTexture(i) = ClearVar
->>>>>>> Refactored and fixed Vgore Particle code
         End If
 
         Set ParticleTexture(i).Texture = DirectD3D8.CreateTextureFromFileEx(DirectDevice, _
-                                                                    Game.Path(Graficos) & "p" & i & ".png", _
+                                                                    Game.path(Graficos) & "p" & i & ".png", _
                                                                     D3DX_DEFAULT, _
                                                                     D3DX_DEFAULT, _
                                                                     D3DX_DEFAULT, _
@@ -337,10 +330,10 @@ Public Sub Effect_Render(ByVal EffectIndex As Integer, Optional ByVal SetRenderS
 '*****************************************************************
 'More info: http://www.vbgore.com/CommonCode.Particles.Effect_Render
 '*****************************************************************
-
+    
     'Check if we have the device
     If DirectDevice.TestCooperativeLevel <> D3D_OK Then Exit Sub
-
+    
     'Set the render state for the size of the particle
     Call DirectDevice.SetRenderState(D3DRS_POINTSIZE, Effect(EffectIndex).FloatSize)
     
@@ -349,19 +342,12 @@ Public Sub Effect_Render(ByVal EffectIndex As Integer, Optional ByVal SetRenderS
         DirectDevice.SetRenderState D3DRS_DESTBLEND, D3DBLEND_ONE
     End If
     
-    With Effect(EffectIndex)
-    
     'Set the texture
-    Call SpriteBatch.SetTexture(ParticleTexture(Effect(EffectIndex).Gfx))
+    Call SpriteBatch.SetTexture(ParticleTexture(Effect(EffectIndex).Gfx).Texture)
 
     'Draw all the particles at once
-    With Effect(EffectIndex).PartVertex(0)
+    Call SpriteBatch.Draw(.X, .Y, ParticleTexture(Effect(EffectIndex).Gfx).TextureWidth, ParticleTexture(Effect(EffectIndex).Gfx).TextureHeight, .Color(), .tu, .tv, , , True, , D3DPT_POINTLIST)
     
-        Call SpriteBatch.Draw(.X, .Y, , , .Color(), .tu, .tv, , , True, , D3DPT_POINTLIST)
-    
-    End With
-    
-
     'Reset the render state back to normal
     If SetRenderStates Then DirectDevice.SetRenderState D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA
 
