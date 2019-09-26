@@ -1,7 +1,7 @@
 Attribute VB_Name = "mDx8_ParticulasVBGORE"
 Option Explicit
 
-Private Declare Sub ZeroMemory Lib "kernel32.dll" Alias "RtlZeroMemory" (ByRef Destination As Any, ByVal Length As Long)
+Public Declare Sub ZeroMemory Lib "kernel32.dll" Alias "RtlZeroMemory" (ByRef Destination As Any, ByVal Length As Long)
 
 Private Type D3DXIMAGE_INFO_A
     Width As Long
@@ -22,9 +22,9 @@ End Type
 'Texture for particle effects - this is handled differently then the rest of the graphics
 Public ParticleTexture(1 To 15) As tParticleTexture
 
-Private Type ParticleVA
-    X As Integer
-    Y As Integer
+Private Type ParticleVA 'TODO: used for old particles should erase maybe?
+    x As Integer
+    y As Integer
     W As Integer
     H As Integer
     
@@ -34,10 +34,12 @@ Private Type ParticleVA
     Ty2 As Single
 End Type
 
+
+
 Private Type Effect
 
-        X As Single                     'Location of effect
-        Y As Single
+        x As Single                     'Location of effect
+        y As Single
         GoToX As Single                 'Location to move to
         GoToY As Single
         KillWhenAtTarget As Boolean     'If the effect is at its target (GoToX/Y), then Progression is set to 0
@@ -50,7 +52,7 @@ Private Type Effect
         Direction As Integer            'Misc variable (depends on the effect)
         Particles() As Particle         'Information on each particle
         Progression As Single           'Progression state, best to design where 0 = effect ends
-        PartVertex() As ParticleVA      'Used to point render particles
+        PartVertex() As TLVERTEX      'Used to point render particles
         PreviousFrame As Long           'Tick time of the last frame
         ParticleCount As Integer        'Number of particles total
         ParticlesLeft As Integer        'Number of particles left - only for non-repetitive effects
@@ -118,22 +120,22 @@ Public Sub Engine_Init_ParticleEngine()
 
 End Sub
 
-Private Function Effect_FToDW(ByVal f As Single) As Long
+Private Function Effect_FToDW(ByVal F As Single) As Long
 
         '*****************************************************************
         'Converts a float to a D-Word, or in Visual Basic terms, a Single to a Long
         'More info: http://www.vbgore.com/CommonCode.Particles.Effect_FToDW
         '*****************************************************************
 
-        Dim buf As D3DXBuffer
+        Dim Buf As D3DXBuffer
 
         With DirectD3D8
             
             'Converts a single into a long (Float to DWORD)
-            Set buf = .CreateBuffer(4)
+            Set Buf = .CreateBuffer(4)
             
-            Call .BufferSetData(buf, 0, 4, 1, f)
-            Call .BufferGetData(buf, 0, 4, 1, Effect_FToDW)
+            Call .BufferSetData(Buf, 0, 4, 1, F)
+            Call .BufferGetData(Buf, 0, 4, 1, Effect_FToDW)
             
         End With
         
@@ -222,8 +224,8 @@ Private Sub Effect_UpdateOffset(ByVal EffectIndex As Integer)
         
             If EffectIndex <> charlist(UserCharIndex).ParticleIndex Then
             
-                .X = .X + (LastOffsetX - ParticleOffsetX)
-                .Y = .Y + (LastOffsetY - ParticleOffsetY)
+                .x = .x + (LastOffsetX - ParticleOffsetX)
+                .y = .y + (LastOffsetY - ParticleOffsetY)
                 
             End If
             
@@ -273,8 +275,8 @@ Private Sub Effect_UpdateBinding(ByVal EffectIndex As Integer)
             Else
  
                 'Calculate the X and Y positions
-                .GoToX = Engine_TPtoSPX(charlist(.BindToChar).Pos.X)
-                .GoToY = Engine_TPtoSPY(charlist(.BindToChar).Pos.Y)
+                .GoToX = Engine_TPtoSPX(charlist(.BindToChar).Pos.x)
+                .GoToY = Engine_TPtoSPY(charlist(.BindToChar).Pos.y)
  
             End If
  
@@ -282,34 +284,34 @@ Private Sub Effect_UpdateBinding(ByVal EffectIndex As Integer)
  
         'Move to the new position if needed
         If .GoToX > -30000 Or .GoToY > -30000 Then
-            If .GoToX <> .X Or .GoToY <> .Y Then
+            If .GoToX <> .x Or .GoToY <> .y Then
  
                 'Calculate the angle
-                TargetA = Engine_GetAngle(.X, .Y, .GoToX, .GoToY) + 180
+                TargetA = Engine_GetAngle(.x, .y, .GoToX, .GoToY) + 180
  
                 'Update the position of the effect
-                .X = .X - Sin(TargetA * DegreeToRadian) * .BindSpeed
-                .Y = .Y + Cos(TargetA * DegreeToRadian) * .BindSpeed
+                .x = .x - Sin(TargetA * DegreeToRadian) * .BindSpeed
+                .y = .y + Cos(TargetA * DegreeToRadian) * .BindSpeed
  
                 'Check if the effect is close enough to the target to just stick it at the target
                 If .GoToX > -30000 Then
-                    If Abs(.X - .GoToX) < 6 Then .X = .GoToX
+                    If Abs(.x - .GoToX) < 6 Then .x = .GoToX
                 End If
 
                 If .GoToY > -30000 Then
-                    If Abs(.Y - .GoToY) < 6 Then .Y = .GoToY
+                    If Abs(.y - .GoToY) < 6 Then .y = .GoToY
                 End If
  
                 'Check if the position of the effect is equal to that of the target
-                If .X = .GoToX Then
-                    If .Y = .GoToY Then
+                If .x = .GoToX Then
+                    If .y = .GoToY Then
  
                         'For some effects, if the position is reached, we want to end the effect
                         If .KillWhenAtTarget Then
                             .BindToChar = 0
                             .Progression = 0
-                            .GoToX = .X
-                            .GoToY = .Y
+                            .GoToX = .x
+                            .GoToY = .y
                         End If
 
                         Exit Sub    'The effect is at the right position, don't update
@@ -330,6 +332,8 @@ Public Sub Effect_Render(ByVal EffectIndex As Integer, Optional ByVal SetRenderS
 '*****************************************************************
 'More info: http://www.vbgore.com/CommonCode.Particles.Effect_Render
 '*****************************************************************
+     Dim temp_verts As TLVERTEX
+    
     
     'Check if we have the device
     If DirectDevice.TestCooperativeLevel <> D3D_OK Then Exit Sub
@@ -343,10 +347,17 @@ Public Sub Effect_Render(ByVal EffectIndex As Integer, Optional ByVal SetRenderS
     End If
     
     'Set the texture
-    Call SpriteBatch.SetTexture(ParticleTexture(Effect(EffectIndex).Gfx).Texture)
+    'Call SpriteBatch.SetTexture(ParticleTexture(Effect(EffectIndex).Gfx).Texture)
 
     'Draw all the particles at once
-    Call SpriteBatch.Draw(.X, .Y, ParticleTexture(Effect(EffectIndex).Gfx).TextureWidth, ParticleTexture(Effect(EffectIndex).Gfx).TextureHeight, .Color(), .tu, .tv, , , True, , D3DPT_POINTLIST)
+    'Call SpriteBatch.Draw(.x, .y, ParticleTexture(Effect(EffectIndex).Gfx).TextureWidth, ParticleTexture(Effect(EffectIndex).Gfx).TextureHeight, .Color(), .tU, .tV, , , True, , D3DPT_POINTLIST)
+    
+    
+    'Set the texture
+    DirectDevice.SetTexture 0, ParticleTexture(Effect(EffectIndex).Gfx).Texture
+
+    'Draw all the particles at once
+    DirectDevice.DrawIndexedPrimitiveUP D3DPT_TRIANGLESTRIP, 0, 4, Effect(EffectIndex).ParticleCount, temp_verts, D3DFMT_INDEX16, Effect(EffectIndex).PartVertex(0), Len(Effect(EffectIndex).PartVertex(0))
     
     'Reset the render state back to normal
     If SetRenderStates Then DirectDevice.SetRenderState D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA
@@ -397,15 +408,15 @@ Sub Effect_UpdateAll()
                     
             End Select
             
-            'Actualizamos el Clima siempre.
-            Call Engine_Weather_Update
-            
             'Render the effect
             Call Effect_Render(LoopC, False)
 
         End If
 
     Next
+    
+    'Actualizamos el Clima siempre.
+    Call Engine_Weather_Update
 
     'Set the render state back for normal rendering
     Call DirectDevice.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA)
@@ -413,8 +424,8 @@ Sub Effect_UpdateAll()
 End Sub
 
 Public Sub Effect_Begin(ByVal EffectIndex As eParticulas, _
-                        ByVal X As Single, _
-                        ByVal Y As Single, _
+                        ByVal x As Single, _
+                        ByVal y As Single, _
                         ByVal GfxIndex As Byte, _
                         ByVal Particles As Byte, _
                         Optional ByVal Direction As Single = 180, _
@@ -442,7 +453,7 @@ Public Sub Effect_Begin(ByVal EffectIndex As eParticulas, _
         
 End Sub
 
-Public Sub Effect_Create(ByVal CharIndex As Integer, ByVal Effect As eParticulas, ByVal X As Single, ByVal Y As Single, ByVal Loops As Integer)
+Public Sub Effect_Create(ByVal CharIndex As Integer, ByVal Effect As eParticulas, ByVal x As Single, ByVal y As Single, ByVal Loops As Integer)
     
         '*****************************************************************
         'A very simplistic form of initialization for particle effects
@@ -452,7 +463,7 @@ Public Sub Effect_Create(ByVal CharIndex As Integer, ByVal Effect As eParticulas
     Select Case Effect
     
         Case eParticulas.Summon
-            charlist(CharIndex).ParticleIndex = Effect_Summon_Begin(X, Y, 1, 500, 0.1)
+            charlist(CharIndex).ParticleIndex = Effect_Summon_Begin(x, y, 1, 500, 0.1)
 
     End Select
 

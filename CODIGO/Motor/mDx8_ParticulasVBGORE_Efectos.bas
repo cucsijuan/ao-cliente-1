@@ -1,6 +1,13 @@
 Attribute VB_Name = "mDx8_ParticulasVBGORE_Efectos"
 Option Explicit
 
+'Constants With The Order Number For Each Effect
+Public Const EffectNum_Snow As Byte = 2             'Snow that covers the screen - weather effect
+Public Const EffectNum_Rain As Byte = 7             'Exact same as snow, but moves much faster and more alpha value - weather effect
+
+'esto lo declaro aca por que falta parece solo usarse en este modulo
+Private WeatherEffectIndex As Integer
+
 Public Function Effect_Snow_Begin(ByVal Gfx As Integer, ByVal Particles As Integer) As Integer
 
     '*****************************************************************
@@ -39,7 +46,7 @@ Public Function Effect_Snow_Begin(ByVal Gfx As Integer, ByVal Particles As Integ
         For LoopC = 0 To .ParticleCount
             Set .Particles(LoopC) = New Particle
             .Particles(LoopC).Used = True
-            .PartVertex(LoopC).rhw = 1
+            .PartVertex(LoopC).Rhw = 1
             Call Effect_Snow_Reset(EffectIndex, LoopC, 1)
         Next LoopC
 
@@ -120,8 +127,8 @@ Public Sub Effect_Snow_Update(ByVal EffectIndex As Integer)
 
                     'Set the particle information on the particle vertex
                     .PartVertex(LoopC).Color = D3DColorMake(.Particles(LoopC).sngR, .Particles(LoopC).sngG, .Particles(LoopC).sngB, .Particles(LoopC).sngA)
-                    .PartVertex(LoopC).X = .Particles(LoopC).sngX
-                    .PartVertex(LoopC).Y = .Particles(LoopC).sngY
+                    .PartVertex(LoopC).x = .Particles(LoopC).sngX
+                    .PartVertex(LoopC).y = .Particles(LoopC).sngY
 
                 End If
 
@@ -141,15 +148,14 @@ Public Function Effect_Rain_Begin(ByVal Gfx As Integer, ByVal Particles As Integ
     Dim EffectIndex As Integer
     Dim LoopC       As Long
     
-    With Effect(EffectIndex)
+    'Get the next open effect slot
+    EffectIndex = Effect_NextOpenSlot
+    If EffectIndex = -1 Then Exit Function
     
-        'Get the next open effect slot
-        EffectIndex = Effect_NextOpenSlot
-
-        If EffectIndex = -1 Then Exit Function
-
-        'Return the index of the used slot
-        Effect_Rain_Begin = EffectIndex
+    'Return the index of the used slot
+    Effect_Rain_Begin = EffectIndex
+        
+    With Effect(EffectIndex)
 
         'Set the effect's variables
         .EffectNum = EffectNum_Rain      'Set the effect number
@@ -171,7 +177,7 @@ Public Function Effect_Rain_Begin(ByVal Gfx As Integer, ByVal Particles As Integ
         For LoopC = 0 To .ParticleCount
             Set .Particles(LoopC) = New Particle
             .Particles(LoopC).Used = True
-            .PartVertex(LoopC).rhw = 1
+            .PartVertex(LoopC).Rhw = 1
             Call Effect_Rain_Reset(EffectIndex, LoopC, 1)
         Next LoopC
 
@@ -252,8 +258,8 @@ Public Sub Effect_Rain_Update(ByVal EffectIndex As Integer)
 
                     'Set the particle information on the particle vertex
                     .PartVertex(LoopC).Color = D3DColorMake(.Particles(LoopC).sngR, .Particles(LoopC).sngG, .Particles(LoopC).sngB, .Particles(LoopC).sngA)
-                    .PartVertex(LoopC).X = .Particles(LoopC).sngX
-                    .PartVertex(LoopC).Y = .Particles(LoopC).sngY
+                    .PartVertex(LoopC).x = .Particles(LoopC).sngX
+                    .PartVertex(LoopC).y = .Particles(LoopC).sngY
 
                 End If
 
@@ -265,8 +271,8 @@ Public Sub Effect_Rain_Update(ByVal EffectIndex As Integer)
     
 End Sub
 
-Public Function Effect_Summon_Begin(ByVal X As Single, _
-                                    ByVal Y As Single, _
+Public Function Effect_Summon_Begin(ByVal x As Single, _
+                                    ByVal y As Single, _
                                     ByVal Gfx As Integer, _
                                     ByVal Particles As Integer, _
                                     Optional ByVal Progression As Single = 0) As Integer
@@ -291,8 +297,8 @@ Public Function Effect_Summon_Begin(ByVal X As Single, _
         .EffectNum = EffectNum_Summon    'Set the effect number
         .ParticleCount = Particles       'Set the number of particles
         .Used = True                     'Enable the effect
-        .X = X                           'Set the effect's X coordinate
-        .Y = Y                           'Set the effect's Y coordinate
+        .x = x                           'Set the effect's X coordinate
+        .y = y                           'Set the effect's Y coordinate
         .Gfx = Gfx                       'Set the graphic
         .Progression = Progression       'If we loop the effect
 
@@ -310,7 +316,7 @@ Public Function Effect_Summon_Begin(ByVal X As Single, _
         For LoopC = 0 To .ParticleCount
             Set .Particles(LoopC) = New Particle
             .Particles(LoopC).Used = True
-            .PartVertex(LoopC).rhw = 1
+            .PartVertex(LoopC).Rhw = 1
             Call Effect_Summon_Reset(EffectIndex, LoopC)
         Next LoopC
 
@@ -326,8 +332,8 @@ Public Sub Effect_Summon_Reset(ByVal EffectIndex As Integer, ByVal Index As Long
     '*****************************************************************
     'More info: http://www.vbgore.com/CommonCode.Particles.Effect_Summon_Reset
     '*****************************************************************
-    Dim X As Single
-    Dim Y As Single
+    Dim x As Single
+    Dim y As Single
     Dim r As Single
     
     With Effect(EffectIndex)
@@ -339,11 +345,11 @@ Public Sub Effect_Summon_Reset(ByVal EffectIndex As Integer, ByVal Index As Long
         End If
 
         r = (Index / 30) * Exp(Index / .Progression)
-        X = r * Cos(Index)
-        Y = r * Sin(Index)
+        x = r * Cos(Index)
+        y = r * Sin(Index)
     
         'Reset the particle
-        Call .Particles(Index).ResetIt(.X + X, .Y + Y, 0, 0, 0, 0)
+        Call .Particles(Index).ResetIt(.x + x, .y + y, 0, 0, 0, 0)
         Call .Particles(Index).ResetColor(0, Rnd, 0, 0.9, 0.2 + (Rnd * 0.2))
     
     End With
@@ -402,8 +408,8 @@ Public Sub Effect_Summon_Update(ByVal EffectIndex As Integer)
             
                     'Set the particle information on the particle vertex
                     .PartVertex(LoopC).Color = D3DColorMake(.Particles(LoopC).sngR, .Particles(LoopC).sngG, .Particles(LoopC).sngB, .Particles(LoopC).sngA)
-                    .PartVertex(LoopC).X = .Particles(LoopC).sngX
-                    .PartVertex(LoopC).Y = .Particles(LoopC).sngY
+                    .PartVertex(LoopC).x = .Particles(LoopC).sngX
+                    .PartVertex(LoopC).y = .Particles(LoopC).sngY
 
                 End If
 
@@ -453,9 +459,10 @@ Public Sub Engine_Weather_Update()
         Call Engine_Weather_UpdateFog
     End If
     
-    If OnRampageImgGrh <> 0 Then
-        Call Draw_GrhIndex(OnRampageImgGrh, 0, 0, 0, Normal_RGBList(), 0, True)
-    End If
+   'esto lo saco hay que ver para que se usaba en vbgore
+   ' If OnRampageImgGrh <> 0 Then
+   '     Call Draw_GrhIndex(OnRampageImgGrh, 0, 0, 0, Normal_RGBList(), 0, True)
+   ' End If
     
 End Sub
 
@@ -465,8 +472,8 @@ Public Sub Engine_Weather_UpdateFog()
     '*****************************************************************
 
     Dim i           As Long
-    Dim X           As Long
-    Dim Y           As Long
+    Dim x           As Long
+    Dim y           As Long
     Dim CC(3)       As Long
     Dim ElapsedTime As Single
 
@@ -513,8 +520,8 @@ Public Sub Engine_Weather_UpdateFog()
     Loop
     
     'Render fog 2
-    X = 2
-    Y = -1
+    x = 2
+    y = -1
     
     With CurMapAmbient
     
@@ -524,20 +531,20 @@ Public Sub Engine_Weather_UpdateFog()
         CC(0) = D3DColorARGB(.Fog, 255, 255, 255)
 
         For i = 1 To WeatherFogCount
-            Call Draw_GrhIndex(27300, (X * 512) + WeatherFogX2, (Y * 512) + WeatherFogY2, 0, CC(), 0, False)
-            X = X + 1
+            Call Draw_GrhIndex(27300, (x * 512) + WeatherFogX2, (y * 512) + WeatherFogY2, 0, CC(), 0, False)
+            x = x + 1
 
-            If X > (1 + (ScreenWidth \ 512)) Then
-                X = 0
-                Y = Y + 1
+            If x > (1 + (ScreenWidth \ 512)) Then
+                x = 0
+                y = y + 1
 
             End If
 
         Next i
             
         'Render fog 1
-        X = 0
-        Y = 0
+        x = 0
+        y = 0
         CC(1) = D3DColorARGB(.Fog / 2, 255, 255, 255)
         CC(2) = D3DColorARGB(.Fog / 2, 255, 255, 255)
         CC(3) = D3DColorARGB(.Fog / 2, 255, 255, 255)
@@ -547,16 +554,58 @@ Public Sub Engine_Weather_UpdateFog()
 
     For i = 1 To WeatherFogCount
         
-        Call Draw_GrhIndex(27301, (X * 512) + WeatherFogX1, (Y * 512) + WeatherFogY1, 0, CC(), 0, False)
+        Call Draw_GrhIndex(27301, (x * 512) + WeatherFogX1, (y * 512) + WeatherFogY1, 0, CC(), 0, False)
         
-        X = X + 1
+        x = x + 1
 
-        If X > (2 + (ScreenWidth \ 512)) Then
-            X = 0
-            Y = Y + 1
+        If x > (2 + (ScreenWidth \ 512)) Then
+            x = 0
+            y = y + 1
 
         End If
 
     Next i
 
 End Sub
+
+Private Function Effect_NextOpenSlot() As Integer
+'*****************************************************************
+'Finds the next open effects index
+'More info: http://www.vbgore.com/CommonCode.Particles.Effect_NextOpenSlot
+'*****************************************************************
+Dim EffectIndex As Integer
+
+    'Find The Next Open Effect Slot
+    Do
+        EffectIndex = EffectIndex + 1   'Check The Next Slot
+        If EffectIndex > NumEffects Then    'Dont Go Over Maximum Amount
+            Effect_NextOpenSlot = -1
+            Exit Function
+        End If
+    Loop While Effect(EffectIndex).Used = True    'Check Next If Effect Is In Use
+
+    'Return the next open slot
+    Effect_NextOpenSlot = EffectIndex
+
+    'Clear the old information from the effect
+    Erase Effect(EffectIndex).Particles()
+    Erase Effect(EffectIndex).PartVertex()
+    ZeroMemory Effect(EffectIndex), LenB(Effect(EffectIndex))
+    Effect(EffectIndex).GoToX = -30000
+    Effect(EffectIndex).GoToY = -30000
+
+End Function
+
+Private Function Effect_FToDW(F As Single) As Long
+'*****************************************************************
+'Converts a float to a D-Word, or in Visual Basic terms, a Single to a Long
+'More info: http://www.vbgore.com/CommonCode.Particles.Effect_FToDW
+'*****************************************************************
+Dim Buf As D3DXBuffer
+
+    'Converts a single into a long (Float to DWORD)
+    Set Buf = DirectD3D8.CreateBuffer(4)
+    DirectD3D8.BufferSetData Buf, 0, 4, 1, F
+    DirectD3D8.BufferGetData Buf, 0, 4, 1, Effect_FToDW
+
+End Function
