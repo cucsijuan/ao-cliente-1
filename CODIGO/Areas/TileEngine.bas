@@ -340,12 +340,12 @@ Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCo
 Public Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long, ByVal crColor As Long) As Long
 Public Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal X As Long, ByVal Y As Long) As Long
 
-Sub ConvertCPtoTP(ByVal viewPortX As Integer, ByVal viewPortY As Integer, ByRef tX As Byte, ByRef tY As Byte)
+Sub ConvertCPtoTP(ByVal viewPortX As Integer, ByVal viewPortY As Integer, ByRef TX As Byte, ByRef TY As Byte)
 '******************************************
 'Converts where the mouse is in the main window to a tile position. MUST be called eveytime the mouse moves.
 '******************************************
-    tX = UserPos.X + viewPortX \ TilePixelWidth - WindowTileWidth \ 2
-    tY = UserPos.Y + viewPortY \ TilePixelHeight - WindowTileHeight \ 2
+    TX = UserPos.X + viewPortX \ TilePixelWidth - WindowTileWidth \ 2
+    TY = UserPos.Y + viewPortY \ TilePixelHeight - WindowTileHeight \ 2
 End Sub
 
 Sub MakeChar(ByVal CharIndex As Integer, ByVal Body As Integer, ByVal Head As Integer, ByVal Heading As Byte, ByVal X As Integer, ByVal Y As Integer, ByVal Arma As Integer, ByVal Escudo As Integer, ByVal Casco As Integer)
@@ -598,8 +598,8 @@ Sub MoveScreen(ByVal nHeading As E_Heading)
 '******************************************
     Dim X As Integer
     Dim Y As Integer
-    Dim tX As Integer
-    Dim tY As Integer
+    Dim TX As Integer
+    Dim TY As Integer
     
     'Figure out which way to move
     Select Case nHeading
@@ -617,18 +617,18 @@ Sub MoveScreen(ByVal nHeading As E_Heading)
     End Select
     
     'Fill temp pos
-    tX = UserPos.X + X
-    tY = UserPos.Y + Y
+    TX = UserPos.X + X
+    TY = UserPos.Y + Y
     
     'Check to see if its out of bounds
-    If tX < MinXBorder Or tX > MaxXBorder Or tY < MinYBorder Or tY > MaxYBorder Then
+    If TX < MinXBorder Or TX > MaxXBorder Or TY < MinYBorder Or TY > MaxYBorder Then
         Exit Sub
     Else
         'Start moving... MainLoop does the rest
         AddtoUserPos.X = X
-        UserPos.X = tX
+        UserPos.X = TX
         AddtoUserPos.Y = Y
-        UserPos.Y = tY
+        UserPos.Y = TY
         UserMoving = 1
         
         bTecho = IIf(MapData(UserPos.X, UserPos.Y).Trigger = 1 Or _
@@ -660,16 +660,16 @@ Function NextOpenChar() As Integer
 '*****************************************************************
 'Finds next open char slot in CharList
 '*****************************************************************
-    Dim loopc As Long
+    Dim LoopC As Long
     Dim Dale As Boolean
     
-    loopc = 1
-    Do While charlist(loopc).active And Dale
-        loopc = loopc + 1
-        Dale = (loopc <= UBound(charlist))
+    LoopC = 1
+    Do While charlist(LoopC).active And Dale
+        LoopC = LoopC + 1
+        Dale = (LoopC <= UBound(charlist))
     Loop
     
-    NextOpenChar = loopc
+    NextOpenChar = LoopC
 End Function
 
 Function LegalPos(ByVal X As Integer, ByVal Y As Integer) As Boolean
@@ -787,7 +787,7 @@ Function GetBitmapDimensions(ByVal BmpFile As String, ByRef bmWidth As Long, ByR
     bmHeight = BINFOHeader.biHeight
 End Function
 
-Public Sub DrawTransparentGrhtoHdc(ByVal dsthdc As Long, ByVal srchdc As Long, ByRef SourceRect As RECT, ByRef destRect As RECT, ByVal TransparentColor As Long)
+Public Sub DrawTransparentGrhtoHdc(ByVal dsthdc As Long, ByVal srchdc As Long, ByRef SourceRect As RECT, ByRef DestRect As RECT, ByVal TransparentColor As Long)
 '**************************************************************
 'Author: Torres Patricio (Pato)
 'Last Modify Date: 27/07/2012 - ^[GS]^
@@ -801,7 +801,7 @@ Public Sub DrawTransparentGrhtoHdc(ByVal dsthdc As Long, ByVal srchdc As Long, B
             Color = GetPixel(srchdc, X, Y)
             
             If Color <> TransparentColor Then
-                Call SetPixel(dsthdc, destRect.Left + (X - SourceRect.Left), destRect.Top + (Y - SourceRect.Top), Color)
+                Call SetPixel(dsthdc, DestRect.Left + (X - SourceRect.Left), DestRect.Top + (Y - SourceRect.Top), Color)
             End If
         Next Y
     Next X
@@ -906,6 +906,18 @@ Sub RenderScreen(ByVal tilex As Integer, _
     ParticleOffsetY = (Engine_PixelPosY(screenminY) - PixelOffsetY)
 
     'Draw floor layer
+    
+    'TODO: esto no creo que sea necesario
+    If screenminY < 1 Then screenminY = 1
+    If screenminX < 1 Then screenminX = 1
+    If screenmaxY > 100 Then screenmaxY = 100
+    If screenmaxX > 100 Then screenmaxX = 100
+
+    If minY < 1 Then minY = 1
+    If minX < 1 Then minX = 1
+    If maxY > 100 Then maxY = 100
+    If maxX > 100 Then maxX = 100
+    
     For Y = screenminY To screenmaxY
         For X = screenminX To screenmaxX
             
@@ -1050,7 +1062,7 @@ Sub RenderScreen(ByVal tilex As Integer, _
 
     If ClientSetup.ParticleEngine Then
         'Weather Update & Render - Aca se renderiza la lluvia, nieve, etc.
-        Call mDx8_Particulas.Engine_Weather_Update()
+        Call mDx8_Particulas.Engine_Weather_Update
     End If
 
     If ClientSetup.ProyectileEngine Then
@@ -1064,7 +1076,7 @@ Sub RenderScreen(ByVal tilex As Integer, _
                     Dim angle As Single
                     
                     'Update the position
-                    angle = DegreeToRadian * Engine_GetAngle(ProjectileList(J).X, ProjectileList(J).Y, ProjectileList(J).tX, ProjectileList(J).tY)
+                    angle = DegreeToRadian * Engine_GetAngle(ProjectileList(J).X, ProjectileList(J).Y, ProjectileList(J).TX, ProjectileList(J).TY)
                     ProjectileList(J).X = ProjectileList(J).X + (Sin(angle) * ElapsedTime * 0.63)
                     ProjectileList(J).Y = ProjectileList(J).Y - (Cos(angle) * ElapsedTime * 0.63)
                     
@@ -1102,8 +1114,8 @@ Sub RenderScreen(ByVal tilex As Integer, _
             For J = 1 To LastProjectile
 
                 If ProjectileList(J).Grh.GrhIndex Then
-                    If Abs(ProjectileList(J).X - ProjectileList(J).tX) < 20 Then
-                        If Abs(ProjectileList(J).Y - ProjectileList(J).tY) < 20 Then
+                    If Abs(ProjectileList(J).X - ProjectileList(J).TX) < 20 Then
+                        If Abs(ProjectileList(J).Y - ProjectileList(J).TY) < 20 Then
                             Call Engine_Projectile_Erase(J)
                         End If
                     End If
@@ -1309,7 +1321,7 @@ Sub ShowNextFrame(ByVal DisplayFormTop As Integer, _
         '//Banco
         If frmBancoObj.Visible Then
             If frmBancoObj.PicBancoInv.Visible Then Call InvBanco(0).DrawInv
-            If frmBancoObj.PicInv.Visible Then Call InvBanco(1).DrawInv
+            If frmBancoObj.picInv.Visible Then Call InvBanco(1).DrawInv
         End If
     
         '//Comercio
@@ -1346,7 +1358,7 @@ Sub ShowNextFrame(ByVal DisplayFormTop As Integer, _
     
         '//Inventario
         If frmMain.Visible Then
-            If frmMain.PicInv.Visible Then
+            If frmMain.picInv.Visible Then
                 Call Inventario.DrawInv
             End If
         End If
@@ -1708,7 +1720,7 @@ Public Sub Device_Textured_Render(ByVal X As Single, ByVal Y As Single, _
                                   ByVal tex As Long, _
                                   ByRef Color() As Long, _
                                   Optional ByVal Alpha As Boolean = False, _
-                                  Optional ByVal Angle As Single = 0)
+                                  Optional ByVal angle As Single = 0)
 
         Dim Texture As Direct3DTexture8
         
@@ -1722,9 +1734,9 @@ Public Sub Device_Textured_Render(ByVal X As Single, ByVal Y As Single, _
                 Call .SetAlpha(Alpha)
                 
                 If TextureWidth <> 0 And TextureHeight <> 0 Then
-                    Call .Draw(X, Y, Width, Height, Color, sX / TextureWidth, sY / TextureHeight, (sX + Width) / TextureWidth, (sY + Height) / TextureHeight, Angle)
+                    Call .Draw(X, Y, Width, Height, Color, sX / TextureWidth, sY / TextureHeight, (sX + Width) / TextureWidth, (sY + Height) / TextureHeight, angle)
                 Else
-                    Call .Draw(X, Y, TextureWidth, TextureHeight, Color, , , , , Angle)
+                    Call .Draw(X, Y, TextureWidth, TextureHeight, Color, , , , , angle)
                 End If
                 
         End With

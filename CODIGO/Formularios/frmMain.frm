@@ -1,11 +1,11 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
 Begin VB.Form frmMain 
    BorderStyle     =   0  'None
-   ClientHeight    =   8985
+   ClientHeight    =   10380
    ClientLeft      =   360
    ClientTop       =   300
-   ClientWidth     =   12000
+   ClientWidth     =   14760
    ClipControls    =   0   'False
    ControlBox      =   0   'False
    DrawMode        =   1  'Blackness
@@ -29,9 +29,9 @@ Begin VB.Form frmMain
    MinButton       =   0   'False
    PaletteMode     =   1  'UseZOrder
    Picture         =   "frmMain.frx":030A
-   ScaleHeight     =   599
-   ScaleMode       =   3  'Pixel
-   ScaleWidth      =   800
+   ScaleHeight     =   678.743
+   ScaleMode       =   0  'User
+   ScaleWidth      =   1003.602
    StartUpPosition =   2  'CenterScreen
    Visible         =   0   'False
    Begin AOLibre.uAOProgress uAOProgressExperienceLevel 
@@ -148,7 +148,7 @@ Begin VB.Form frmMain
       ForeColor       =   &H80000008&
       Height          =   450
       Index           =   0
-      Left            =   10050
+      Left            =   10080
       MousePointer    =   99  'Custom
       ScaleHeight     =   30
       ScaleMode       =   3  'Pixel
@@ -261,7 +261,6 @@ Begin VB.Form frmMain
       _ExtentY        =   2619
       _Version        =   393217
       BackColor       =   0
-      Enabled         =   -1  'True
       ReadOnly        =   -1  'True
       ScrollBars      =   2
       DisableNoScroll =   -1  'True
@@ -290,15 +289,15 @@ Begin VB.Form frmMain
    Begin VB.PictureBox MainViewPic 
       BackColor       =   &H00000000&
       BorderStyle     =   0  'None
-      Height          =   6240
+      Height          =   8160
       Left            =   180
       MousePointer    =   99  'Custom
-      ScaleHeight     =   416
+      ScaleHeight     =   544
       ScaleMode       =   3  'Pixel
-      ScaleWidth      =   544
+      ScaleWidth      =   736
       TabIndex        =   30
       Top             =   2220
-      Width           =   8160
+      Width           =   11040
       Begin VB.Timer trainingMacro 
          Enabled         =   0   'False
          Interval        =   3200
@@ -1074,8 +1073,8 @@ Private Sub Form_Load()
         .Picture = LoadPicture(Game.path(Skins) & SkinSeleccionado & "\VentanaPrincipal.JPG")
         .Left = 0
         .Top = 0
-        .Width = 12000
-        .Height = 9000
+        .Width = 15000
+        .Height = 10410
         .Label6 = JsonLanguage.item("NIVEL").item("TEXTO") & ": "
     End With
 
@@ -2686,8 +2685,8 @@ Private Function InGameArea() As Boolean
     'Last Modification: 04/07/08
     'Checks if last click was performed within or outside the game area.
     '***************************************************
-    If clicX < 0 Or clicX > (32 * (Round(frmMain.MainViewPic.Width / 32))) Then Exit Function
-    If clicY < 0 Or clicY > (32 * (Round(frmMain.MainViewPic.Height / 32))) Then Exit Function
+    If clicX < frmMain.MainViewPic.Left Or clicX > frmMain.MainViewPic.Left + (32 * 23) Then Exit Function
+    If clicY < frmMain.MainViewPic.Top Or clicY > frmMain.MainViewPic.Top + (32 * 17) Then Exit Function
     
     InGameArea = True
 End Function
